@@ -14,16 +14,19 @@ public class Driver {
 	private static URL site;
 	ArrayList<String> toVisit;
 	ArrayList<String> hasVisit;
+	ArrayList<String> siteLines = new ArrayList<>();
+	ArrayList<String> siteLinks = new ArrayList<>();
+	int maxVisited = 0;
 
 	// Scanner scan = new Scanner(InputStream);
 
-	public void processPage(InputStream in, ArrayList<String> linesHTML) throws IOException {
+	public void processPage(BufferedReader in, ArrayList<String> linesHTML) throws IOException {
 		String line = "";
-		InputStreamReader readThis = new InputStreamReader(in);
-		BufferedReader read = new BufferedReader(readThis);
+		// InputStreamReader readThis = new InputStreamReader(in);
+		// BufferedReader read = new BufferedReader(readThis);
 		try {
 
-			while ((line = read.readLine()) != null) {
+			while ((line = in.readLine()) != null) {
 				// System.out.println(line);
 				linesHTML.add(line);
 			}
@@ -47,13 +50,30 @@ public class Driver {
 	}
 
 	public static void main(String[] args) throws IOException {
-		site = new URL("http://shalladay-iis1.student.neumont.edu/");
-		BufferedReader in = new BufferedReader(new InputStreamReader(site.openStream()));
-		String inputLine;
-		while ((inputLine = in.readLine()) != null) {
-			System.out.println(inputLine);
+		Driver d = new Driver();
+		try {
+			site =
+			// new URL("https://www.google.com/?gws_rd=ssl");
+			new URL("http://shalladay-iis1.student.neumont.edu/");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		in.close();
+		BufferedReader in = null;
+		try {
+			in = new BufferedReader(new InputStreamReader(site.openStream()));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ArrayList<String> sl = d.siteLines;
+		ArrayList<String> html = d.siteLines;
+		d.processPage(in, sl);
+		for (int x = 0; x < sl.size(); x++) {
+			d.htmlLinksPattern(sl.get(x), html);
+		}
+		// System.out.println(html);
+		
 	}
 
 }
