@@ -3,8 +3,8 @@ package app;
 import java.net.URL;
 
 public interface VisitAction {
-	public static void visit(URL url){
+	public void visit(URL url);
 		
-	}
+	
 
 }

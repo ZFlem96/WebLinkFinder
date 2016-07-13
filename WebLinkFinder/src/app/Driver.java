@@ -66,12 +66,68 @@ public class Driver {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
 		ArrayList<String> sl = d.siteLines;
-		ArrayList<String> html = d.siteLines;
+		ArrayList<String> html = d.siteLinks;
 		d.processPage(in, sl);
+//		for(int x =0;x<sl.size();x++){
+//			System.out.println(sl.get(x));
+//		}
+//		System.out.println(sl);
 		for (int x = 0; x < sl.size(); x++) {
 			d.htmlLinksPattern(sl.get(x), html);
 		}
+		int y = 0;
+		String[] mainPageLinks = new String[html.size()];
+		while(y != 4){
+		mainPageLinks[y] = "http://shalladay-iis1.student.neumont.edu"+html.get(y);
+//		System.out.println(mainPageLinks[y]);
+		y++;
+		}
+		ArrayList<String> ml1 = d.siteLines;
+		ArrayList<String> html1 = d.siteLinks;
+		ArrayList<String> ml2 = d.siteLines;
+		ArrayList<String> html2 = d.siteLinks;
+		ArrayList<String> ml3 = d.siteLines;
+		ArrayList<String> html3 = d.siteLinks;
+		ArrayList<String> ml4 = d.siteLines;
+		ArrayList<String> html4 = d.siteLinks;
+		for(int u = 0; u<mainPageLinks.length;u++){
+			site=new URL(mainPageLinks[u]);
+			in = new BufferedReader(new InputStreamReader(site.openStream()));
+			if(u==0){
+				d.processPage(in, ml1);
+				for (int x = 0; x < ml1.size(); x++) {
+					d.htmlLinksPattern(ml1.get(x), html1);
+				}
+			}
+			else if(u==1){
+				d.processPage(in, ml2);
+				for (int x = 0; x < ml2.size(); x++) {
+					d.htmlLinksPattern(ml2.get(x), html2);
+				}
+			}
+			else if(u==2){
+				d.processPage(in, ml3);
+				for (int x = 0; x < ml3.size(); x++) {
+					d.htmlLinksPattern(ml3.get(x), html3);
+				}
+			}
+			else if(u==3){
+				d.processPage(in, ml4);
+				for (int x = 0; x < ml4.size(); x++) {
+					d.htmlLinksPattern(ml4.get(x), html4);
+				}
+			}
+		}
+		System.out.println(html1);
+		System.out.println("////////");
+		System.out.println(html2);
+		System.out.println("////////");
+		System.out.println(html3);
+		System.out.println("////////");
+		System.out.println(html4);
+//		System.out.println(html);
 		// System.out.println(html);
 		
 	}
