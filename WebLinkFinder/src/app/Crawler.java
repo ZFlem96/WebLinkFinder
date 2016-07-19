@@ -1,75 +1,91 @@
 package app;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-//import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+import LinkFinderApp.LinkFinder;
 
 public class Crawler implements VisitAction {
-	static ArrayList<URL> toVisit;
-	static ArrayList<URL> hasVisited;
-	private static final int MAX_VALUE = 100;
+	private static int MAX_COUNT;
+	VisitAction action;
+	ArrayList<URL> toVisit, hasVisited;
 
-	public void crawl(ArrayList<URL> toVisit, ArrayList<URL> visited) {
-		int counter =0;
-		while (!toVisit.isEmpty() && counter < MAX_VALUE) {
+	public Crawler(ArrayList<URL> toVisit, ArrayList<URL> hasVisited, int MAX_COUNT, VisitAction action,
+			String hostURL) {
+		this.action = action;
+		this.MAX_COUNT = MAX_COUNT;
+		this.toVisit = toVisit;
+		this.hasVisited = hasVisited;
+		URL url = null;
+		try {
+			url = new URL(hostURL);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		toVisit.add(url);
+	}
+
+	public void crawl() {
+		try {
+			int counter = 0;
+			URL host = new URL(toVisit.get(0).toString());
+			String hostString = "";
+			for (int x = 0; x < host.toString().length() - 1; x++) {
+				hostString += host.toString().charAt(x);
+			}
+			while (!toVisit.isEmpty() && counter < MAX_COUNT) {
+				// if(counter<MAX_COUNT){
 				URL tmp = toVisit.get(0);
-				if (counter > 0) {
-					if (!tmp.toString().startsWith("http://shalladay-iis1.student.neumont.edu/")) {
-						String con = tmp.toString();
-						try {
-							tmp = new URL("http://shalladay-iis1.student.neumont.edu/" + con);
-						} catch (Exception e) {
-
-							e.printStackTrace();
+				action.Visit(tmp);
+				hasVisited.add(tmp);
+				toVisit.remove(0);
+				counter++;
+				LinkFinder linkFinder = new LinkFinder();
+				linkFinder.processPage(tmp.openStream());
+				boolean isFound = false;
+				for (Iterator<String> i = linkFinder.getLinks(); i.hasNext();) {
+					String link = i.next();
+					for (int b = 0; b < toVisit.size(); b++) {
+						if (!isFound && toVisit.get(b).toString().contains(link)) {
+							isFound = true;
 						}
 					}
-				}
-				visited.add(tmp);
-				toVisit.remove(0);
-				try {
-					visit(tmp, toVisit, visited);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			
-			counter++;
-		}
-	}
-
-	// public void visit(URL url)
-	public void visit(URL url, ArrayList<URL> toVisit, ArrayList<URL> visited) throws Exception {
-		BufferedReader proccesUrl = new BufferedReader(new InputStreamReader(url.openStream()));
-		Driver a = new Driver();
-		ArrayList<String> testSiteLines = new ArrayList<>();
-		ArrayList<URL> testSiteLinks = new ArrayList<>();
-		a.processPage(proccesUrl, testSiteLines);
-		for (int x = 0; x < testSiteLines.size(); x++) {
-			a.htmlLinksPattern(testSiteLines.get(x), testSiteLinks);
-		}
-		boolean isFound = false;
-		URL siteL;
-		for (Iterator<URL> siteLinks = testSiteLinks.iterator(); siteLinks.hasNext();) {
-			siteL = siteLinks.next();
-			for (int b = 0; b < toVisit.size(); b++) {
-				if (!isFound && siteL.equals(toVisit.get(b))) {
-					isFound = true;
-				}
-			}
-			if (!isFound) {
-				for (int c = 0; c < visited.size(); c++) {
-					if (!isFound && siteL.equals(visited.get(c))) {
-						isFound = true;
+					if (!isFound) {
+						for (int c = 0; c < hasVisited.size(); c++) {
+							if (!isFound && hasVisited.get(c).toString().contains(link)) {
+								isFound = true;
+							}
+						}
+						if (!link.startsWith("http") && !isFound) {
+							String linkTmp = link;
+							link = hostString + linkTmp;
+							URL getLink = new URL(link);
+							toVisit.add(getLink);
+						}
 					}
+
 				}
-				if (!isFound) {
-					toVisit.add(siteL);
-				}
+				// }
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		 System.out.println("/////////////");
+		 for (int i = 0; i < toVisit.size(); i++) {
+		 System.out.println((i + 1) + ". " + toVisit.get(i));
+		 }
+		System.out.println("/////////////");
+		for (int i = 0; i < hasVisited.size(); i++) {
+			System.out.println((i + 1) + ". " + hasVisited.get(i));
+		}
+	}
+
+	@Override
+	public void Visit(URL url) {
+		System.out.println(url);
 
 	}
+
 }
